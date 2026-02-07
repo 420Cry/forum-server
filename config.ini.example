@@ -4,8 +4,8 @@ SSH_PRIVATE_KEY=~/.ssh/id_rsa
 # Directory containing forum-api and forum-app (siblings of forum-server).
 PROJECTS_DIRECTORY=~/projects/forum
 
-# GitHub org/owner for cloning. Repos: GITHUB_ORG/forum-api, GITHUB_ORG/forum-app
-GITHUB_ORG=your-org
+# GitHub org/owner
+GITHUB_ORG=420Cry
 
 # Project folders to manage (must exist under PROJECTS_DIRECTORY).
 PROJECTS="forum-api forum-app"
