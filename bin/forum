@@ -1,0 +1,134 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd -- "$(dirname "$0")" >/dev/null 2>&1; pwd -P)"
+BASE_DIR="$(dirname "$SCRIPT_DIR")"
+CONFIG_FILE=$BASE_DIR/config.ini
+RELEASE_ALL_PROJECTS="forum-api forum-app"
+
+_loadUserConfiguration() {
+    if [ -s "$CONFIG_FILE" ]; then
+        # shellcheck source=config.ini
+        . "$CONFIG_FILE"
+    else
+        echo "Configuration file '$CONFIG_FILE' does not exist or is empty."
+        echo "Create it: cp config.ini.example config.ini"
+        exit 1
+    fi
+
+    if [[ ! -f ${SSH_PRIVATE_KEY} ]]; then
+        echo "SSH private key '${SSH_PRIVATE_KEY}' does not exist."
+        exit 1
+    fi
+
+    if [[ ! -d ${PROJECTS_DIRECTORY} ]]; then
+        echo "Projects directory '${PROJECTS_DIRECTORY}' does not exist."
+        exit 1
+    fi
+}
+_loadUserConfiguration
+
+# Command Handlers
+help() {
+    echo "forum - Forum dev-server CLI"
+    echo
+    echo "Commands:"
+    echo "  up                 Start proxy and all forum projects"
+    echo "  down               Stop all forum projects and proxy"
+    echo "  install:script     Install the forum alias"
+    echo "  install:clone      Clone all forum repos"
+    echo "  help               Show this help"
+}
+
+up() {
+    PROJECTS=${PROJECTS:-$RELEASE_ALL_PROJECTS}
+    echo "Ensuring forum.test network exists..."
+    docker network create forum.test 2>/dev/null || true
+    echo "Starting proxy..."
+    docker compose -f "$BASE_DIR/docker-compose.yaml" up -d
+
+    for PROJECT in $PROJECTS; do
+        echo "Starting $PROJECT"
+        COMPOSE_FILE="$PROJECTS_DIRECTORY/$PROJECT/docker-compose.yml"
+        if [[ ! -f "$COMPOSE_FILE" ]]; then
+            COMPOSE_FILE="$PROJECTS_DIRECTORY/$PROJECT/docker-compose.yaml"
+        fi
+        if [[ ! -f "$COMPOSE_FILE" ]]; then
+            echo "Error: docker-compose not found for $PROJECT"
+            exit 1
+        fi
+        docker compose -f "$COMPOSE_FILE" up -d --build
+    done
+}
+
+down() {
+    PROJECTS=${PROJECTS:-$RELEASE_ALL_PROJECTS}
+
+    for PROJECT in $PROJECTS; do
+        echo "Stopping $PROJECT"
+        COMPOSE_FILE="$PROJECTS_DIRECTORY/$PROJECT/docker-compose.yml"
+        if [[ ! -f "$COMPOSE_FILE" ]]; then
+            COMPOSE_FILE="$PROJECTS_DIRECTORY/$PROJECT/docker-compose.yaml"
+        fi
+        if [[ -f "$COMPOSE_FILE" ]]; then
+            docker compose -f "$COMPOSE_FILE" down
+        fi
+    done
+
+    echo "Stopping proxy..."
+    docker compose -f "$BASE_DIR/docker-compose.yaml" down
+}
+
+installScript() {
+    ALIAS="alias forum='$BASE_DIR/bin/forum'"
+    if [[ "$SHELL" == *zsh ]]; then
+        SHELL_CONFIG="$HOME/.zshrc"
+    elif [[ "$SHELL" == *bash ]]; then
+        SHELL_CONFIG="$HOME/.bashrc"
+    else
+        SHELL_CONFIG="$HOME/.profile"
+    fi
+    echo "$ALIAS" >>"$SHELL_CONFIG"
+    echo "Alias added to $SHELL_CONFIG. Run 'source $SHELL_CONFIG' or restart terminal."
+}
+
+installClone() {
+    GITHUB_ORG=${GITHUB_ORG:-your-org}
+    echo "Cloning forum repos to $PROJECTS_DIRECTORY"
+    _installCloneIfNotExisting "${GITHUB_ORG}/forum-api" forum-api
+    _installCloneIfNotExisting "${GITHUB_ORG}/forum-app" forum-app
+}
+
+_installCloneIfNotExisting() {
+    REPO=$1
+    DIRECTORY=$2
+    CLONE_PATH="${PROJECTS_DIRECTORY}/${DIRECTORY}"
+
+    if [ ! -w "${PROJECTS_DIRECTORY}" ]; then
+        echo "Error: ${PROJECTS_DIRECTORY} is not writable."
+        exit 1
+    fi
+
+    if [ ! -d "${CLONE_PATH}" ]; then
+        git clone "git@github.com:${REPO}.git" "${CLONE_PATH}" || {
+            echo "Error: Failed to clone ${REPO}. Check SSH key and repo URL."
+            exit 1
+        }
+    else
+        echo "${DIRECTORY} already exists at ${CLONE_PATH}"
+    fi
+}
+
+COMMAND="$1"
+case "$COMMAND" in
+    up) up ;;
+    down) down ;;
+    install:script) installScript ;;
+    install:clone) installClone ;;
+    help|"") help ;;
+    *)
+        echo "Unknown command: $COMMAND"
+        echo "Run 'forum help' for usage."
+        exit 1
+        ;;
+esac

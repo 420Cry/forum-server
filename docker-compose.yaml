@@ -1,0 +1,15 @@
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    volumes:
+      - ./docker/proxy/nginx-templates:/etc/nginx/templates
+      - ./docker/proxy/proxy_params:/etc/nginx/proxy_params
+    ports:
+      - "80:80"
+    environment:
+      NGINX_ENVSUBST_OUTPUT_DIR: /etc/nginx/conf.d
+
+networks:
+  default:
+    name: forum.test
