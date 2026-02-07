@@ -13,3 +13,4 @@ services:
 networks:
   default:
     name: forum.test
+    external: true

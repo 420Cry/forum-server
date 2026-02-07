@@ -1,6 +1,6 @@
 map $http_host $mapped_remote_host {
-    api.forum.test    forum-api;
-    app.forum.test    forum-app;
+    api.forum.test    forum-api:3001;
+    app.forum.test    forum-app:3000;
     default false;
 }
 
