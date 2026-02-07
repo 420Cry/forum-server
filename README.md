@@ -11,7 +11,7 @@ Dev server for the forum project. Connects forum-app and forum-api via a reverse
 
 1. Clone this repo:
    ```sh
-   git clone <forum-server-repo> ~/projects/forum/forum-server
+   gh repo clone 420Cry/forum-server ~/projects/forum/forum-server
    cd ~/projects/forum/forum-server
    ```
 
