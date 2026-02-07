@@ -8,7 +8,7 @@ RELEASE_ALL_PROJECTS="forum-api forum-app"
 
 _loadUserConfiguration() {
     if [ -s "$CONFIG_FILE" ]; then
-        # shellcheck source=config.ini
+        # shellcheck disable=SC1091
         . "$CONFIG_FILE"
     else
         echo "Configuration file '$CONFIG_FILE' does not exist or is empty."
