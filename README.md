@@ -32,9 +32,21 @@ Dev server for the forum project. Connects forum-app and forum-api via a reverse
    forum install:clone
    ```
 
-5. Start everything:
+5. Setup env and install dependencies:
+   ```sh
+   forum repo:setup
+   ```
+   This copies `.env.example` to `.env` and runs `npm install` in forum-api and forum-app.
+   Then edit the `.env` files as needed.
+
+6. Start everything:
    ```sh
    forum up
+   ```
+
+## Help command
+   ```sh
+   forum help
    ```
 
 ## Commands
@@ -44,6 +56,7 @@ Dev server for the forum project. Connects forum-app and forum-api via a reverse
 | `forum up` | Start proxy + all forum projects |
 | `forum down` | Stop all projects + proxy |
 | `forum install:clone` | Clone forum-api, forum-app repos |
+| `forum repo:setup` | Copy .env.example to .env and npm install in forum-api, forum-app |
 | `forum install:script` | Add `forum` alias to shell |
 
 ## URLs (with proxy)
