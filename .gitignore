@@ -1,0 +1,4 @@
+/config.ini
+/docker-compose.override.yaml
+.DS_Store
+.idea
