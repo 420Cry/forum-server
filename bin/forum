@@ -157,8 +157,8 @@ repoSetup() {
     echo "✓ Successfully installed node_modules for all forum repos."
     echo
     echo "Next steps: Modify the .env files in forum-api and forum-app as needed:"
-    echo "  - forum-api/.env  (PORT, CORS_ORIGIN)"
-    echo "  - forum-app/.env  (NUXT_PUBLIC_FORUM_API_URL)"
+    echo "  - forum-api/.env"
+    echo "  - forum-app/.env"
     echo
 }
 
