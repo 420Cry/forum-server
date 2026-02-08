@@ -78,3 +78,4 @@ Add to `/etc/hosts`:
 - 80 – Proxy (nginx)
 - 3000 – forum-app (direct)
 - 3001 – forum-api (direct)
+- 3306 – MySQL (direct)
