@@ -41,7 +41,8 @@ Dev server for the forum project. Connects forum-app and forum-api via a reverse
 
 6. Start everything:
    ```sh
-   forum up
+   forum up          # production
+   forum dev         # hot-reload (mounts source, runs watch mode)
    ```
 
 ## Help command
@@ -53,7 +54,8 @@ Dev server for the forum project. Connects forum-app and forum-api via a reverse
 
 | Command | Description |
 |---------|-------------|
-| `forum up` | Start proxy + all forum projects |
+| `forum up` | Start proxy + all forum projects (production) |
+| `forum dev` | Start proxy + all forum projects (hot-reload) |
 | `forum down` | Stop all projects + proxy |
 | `forum install:clone` | Clone forum-api, forum-app repos |
 | `forum repo:setup` | Copy .env.example to .env and npm install in forum-api, forum-app |
@@ -76,3 +78,4 @@ Add to `/etc/hosts`:
 - 80 – Proxy (nginx)
 - 3000 – forum-app (direct)
 - 3001 – forum-api (direct)
+- 3306 – MySQL (direct)
